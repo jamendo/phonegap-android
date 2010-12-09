@@ -160,6 +160,13 @@ Media.prototype.pause = function() {
 };
 
 /**
+ * Set volume of the audio file.
+ */
+Media.prototype.setVolume = function(leftVolume,rightVolume) {
+    PhoneGap.exec(null, null, "Media", "setVolumeAudio", [this.id,leftVolume,rightVolume]);
+};
+
+/**
  * Get duration of an audio file.
  * The duration is only set for audio that is playing, paused or stopped.
  *

@@ -48,6 +48,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 	private static int MEDIA_ERROR_RESUME_STATE = 6;
 	private static int MEDIA_ERROR_PAUSE_STATE = 7;
 	private static int MEDIA_ERROR_STOP_STATE = 8;
+	private static int MEDIA_ERROR_VOLUME_SET = 9;
 
 	private AudioHandler handler;					// The AudioHandler object
 	private String id;								// The id of this player (used to identify Media object in JavaScript)
@@ -260,6 +261,19 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 		else {
 			System.out.println("AudioPlayer Error: stopPlaying() called during invalid state: "+this.state);			
 			this.handler.sendJavascript("PhoneGap.Media.onStatus('" + this.id + "', "+MEDIA_ERROR+", "+MEDIA_ERROR_STOP_STATE+");");			
+		}
+	}
+	
+    /**
+     * Set volume of the audio file.
+     */	
+	public void setVolume(String leftVolume,String rightVolume){
+		try{
+			this.mPlayer.setVolume(Float.parseFloat(leftVolume), Float.parseFloat(rightVolume));
+		}
+		catch(NumberFormatException e){
+			System.out.println("AudioPlayer Error: setVolume() needs floats parameters ");
+			this.handler.sendJavascript("PhoneGap.Media.onStatus('" + this.id + "', "+MEDIA_ERROR+", "+MEDIA_ERROR_VOLUME_SET+");");
 		}
 	}
 	

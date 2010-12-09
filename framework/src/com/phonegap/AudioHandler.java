@@ -20,7 +20,7 @@ import android.content.Context;
 import android.media.AudioManager;
 
 /**
- * This class called by PhonegapActivity to play and record audio.  
+ * This class called by DroidGap to play and record audio.  
  * The file can be local or over a network using http.
  * 
  * Audio formats supported (tested):
@@ -68,6 +68,9 @@ public class AudioHandler extends Plugin {
 			}
 			else if (action.equals("stopPlayingAudio")) {
 				this.stopPlayingAudio(args.getString(0));
+			}
+			else if (action.equals("setVolumeAudio")) {
+				this.setVolumeAudio(args.getString(0), args.getString(1), args.getString(2));
 			}
 			else if (action.equals("getCurrentPositionAudio")) {
 				long l = this.getCurrentPositionAudio(args.getString(0));
@@ -186,6 +189,21 @@ public class AudioHandler extends Plugin {
     		//audio.destroy();
     		//this.players.remove(id);
     	}
+    }
+    
+    /**
+     * Set the volume of the audio file.
+     * 
+	 * @param id				The id of the audio player
+	 * @param leftVolume		left volume scalar
+	 * @param rightVolume		right volume scalar
+     */ 
+    
+    public void setVolumeAudio(String id, String leftVolume, String rightVolume){
+    	AudioPlayer audio = this.players.get(id);
+    	if (audio != null) {
+    		audio.setVolume(leftVolume, rightVolume);
+    	}    	
     }
     
     /**
