@@ -73,7 +73,7 @@ PhoneGap.Media.onStatus = function(id, msg, value) {
  * @param positionCallback      The callback to be called when media position has changed.
  *                                  positionCallback(long position) - OPTIONAL
  */
-Media = function(src, successCallback, errorCallback, statusCallback, positionCallback) {
+Media = function(src, successCallback, errorCallback, statusCallback, positionCallback, leftVolume, rightVolume) {
 
     // successCallback optional
     if (successCallback && (typeof successCallback != "function")) {
@@ -106,8 +106,14 @@ Media = function(src, successCallback, errorCallback, statusCallback, positionCa
     this.errorCallback = errorCallback;
     this.statusCallback = statusCallback;
     this.positionCallback = positionCallback;
+    this._leftVolume = 1;
+    this._rightVolume = 1;
     this._duration = -1;
     this._position = -1;
+    
+    if(leftVolume) this._leftVolume = leftVolume;
+    if(rightVolume) this._rightVolume = rightVolume;
+    
 };
 
 // Media messages
@@ -142,7 +148,7 @@ MediaError.MEDIA_ERR_NONE_SUPPORTED = 4;
  * Start or resume playing audio file.
  */
 Media.prototype.play = function() {
-    PhoneGap.exec(null, null, "Media", "startPlayingAudio", [this.id, this.src]);
+    PhoneGap.exec(null, null, "Media", "startPlayingAudio", [this.id, this.src, this._leftVolume,this._rightVolume]);
 };
 
 /**
@@ -162,8 +168,8 @@ Media.prototype.pause = function() {
 /**
  * Set volume of the audio file.
  */
-Media.prototype.setVolume = function(leftVolume,rightVolume) {
-    PhoneGap.exec(null, null, "Media", "setVolumeAudio", [this.id,leftVolume,rightVolume]);
+Media.prototype.setVolume = function(leftVolume, rightVolume) {
+    return PhoneGap.exec(null, null, "Media", "setVolumeAudio", [this.id,leftVolume,rightVolume]);
 };
 
 /**

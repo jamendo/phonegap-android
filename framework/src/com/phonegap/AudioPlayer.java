@@ -15,6 +15,7 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaRecorder;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.util.Log;
 
 /**
  * This class implements the audio playback and recording capabilities used by PhoneGap.
@@ -55,6 +56,8 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 	private int state = MEDIA_NONE;					// State of recording or playback
 	private String audioFile = null;				// File name to play or record to
 	private long duration = -1;						// Duration of audio
+	private float leftVolume = 1;						// Volume of media
+	private float rightVolume = 1;						// Volume of media
 
 	private MediaRecorder recorder = null;			// Audio recording object
 	private String tempFile = null;					// Temporary recording file name
@@ -167,7 +170,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      * 
      * @param file				The name of the audio file.
      */
-	public void startPlaying(String file) {
+	public void startPlaying(String file, String leftVolume, String rightVolume) {
 		if (this.recorder != null) {
 			System.out.println("AudioPlayer Error: Can't play in record mode.");
 			this.handler.sendJavascript("PhoneGap.Media.onStatus('" + this.id + "', "+MEDIA_ERROR+", "+MEDIA_ERROR_RECORD_MODE_SET+");");
@@ -185,6 +188,8 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 					this.mPlayer = new MediaPlayer();
 				}
 				this.audioFile = file;
+				
+				this.setVolume(leftVolume, rightVolume);
 				
 				// If streaming file
 				if (this.isStreaming(file)) {
@@ -267,13 +272,17 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     /**
      * Set volume of the audio file.
      */	
-	public void setVolume(String leftVolume,String rightVolume){
+	public boolean setVolume(String leftVolume,String rightVolume){
 		try{
 			this.mPlayer.setVolume(Float.parseFloat(leftVolume), Float.parseFloat(rightVolume));
+			this.leftVolume = Float.parseFloat(leftVolume);
+			this.rightVolume = Float.parseFloat(rightVolume);
+			return true;
 		}
 		catch(NumberFormatException e){
 			System.out.println("AudioPlayer Error: setVolume() needs floats parameters ");
 			this.handler.sendJavascript("PhoneGap.Media.onStatus('" + this.id + "', "+MEDIA_ERROR+", "+MEDIA_ERROR_VOLUME_SET+");");
+			return false;
 		}
 	}
 	
@@ -339,7 +348,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 		// If no player yet, then create one
 		else {
 			this.prepareOnly = true;
-			this.startPlaying(file);
+			this.startPlaying(file,this.leftVolume+"",this.rightVolume+"");
 			
 			// This will only return value for local, since streaming
 			// file hasn't been read yet.
@@ -361,7 +370,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 			
 			// Start playing
 			this.mPlayer.start();
-
+			
 			// Set player init flag
 			this.setState(MEDIA_RUNNING);
 		}
@@ -369,7 +378,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 		// Save off duration
 		this.duration = this.mPlayer.getDuration();	
 		this.prepareOnly = false;
-
+		
 		// Send status notification to JavaScript
 		this.handler.sendJavascript("PhoneGap.Media.onStatus('" + this.id + "', "+MEDIA_DURATION+","+this.duration+");");
 		

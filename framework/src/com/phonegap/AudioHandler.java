@@ -61,7 +61,7 @@ public class AudioHandler extends Plugin {
 				this.stopRecordingAudio(args.getString(0));
 			}
 			else if (action.equals("startPlayingAudio")) {
-				this.startPlayingAudio(args.getString(0), args.getString(1));
+				this.startPlayingAudio(args.getString(0), args.getString(1),args.getString(2),args.getString(3));
 			}
 			else if (action.equals("pausePlayingAudio")) {
 				this.pausePlayingAudio(args.getString(0));
@@ -70,7 +70,8 @@ public class AudioHandler extends Plugin {
 				this.stopPlayingAudio(args.getString(0));
 			}
 			else if (action.equals("setVolumeAudio")) {
-				this.setVolumeAudio(args.getString(0), args.getString(1), args.getString(2));
+				boolean setted = this.setVolumeAudio(args.getString(0), args.getString(1), args.getString(2));
+				return new PluginResult(status, setted);
 			}
 			else if (action.equals("getCurrentPositionAudio")) {
 				long l = this.getCurrentPositionAudio(args.getString(0));
@@ -155,14 +156,16 @@ public class AudioHandler extends Plugin {
      * 
 	 * @param id				The id of the audio player
      * @param file				The name of the audio file.
+     * @param leftVolume		Inital left volume scalar
+     * @param rightVolume		Inital right volume scalar
      */
-    public void startPlayingAudio(String id, String file) {
+    public void startPlayingAudio(String id, String file, String leftVolume, String rightVolume) {
     	AudioPlayer audio = this.players.get(id);
     	if (audio == null) {
     		audio = new AudioPlayer(this, id);
     		this.players.put(id, audio);
     	}
-    	audio.startPlaying(file);
+    	audio.startPlaying(file,leftVolume,rightVolume);
     }
 
     /**
@@ -199,11 +202,12 @@ public class AudioHandler extends Plugin {
 	 * @param rightVolume		right volume scalar
      */ 
     
-    public void setVolumeAudio(String id, String leftVolume, String rightVolume){
+    public boolean setVolumeAudio(String id, String leftVolume, String rightVolume){
     	AudioPlayer audio = this.players.get(id);
     	if (audio != null) {
-    		audio.setVolume(leftVolume, rightVolume);
-    	}    	
+    		return audio.setVolume(leftVolume, rightVolume);
+    	}
+    	return false;
     }
     
     /**
@@ -278,4 +282,5 @@ public class AudioHandler extends Plugin {
 			return -1;
 		}
     }       
+	
 }
