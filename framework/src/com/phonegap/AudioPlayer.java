@@ -15,7 +15,6 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaRecorder;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.util.Log;
 
 /**
  * This class implements the audio playback and recording capabilities used by PhoneGap.
@@ -293,6 +292,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
 	 */
 	public void onCompletion(MediaPlayer mPlayer) {
 		this.setState(MEDIA_STOPPED);
+		this.handler.destroyPlayer(this.id);
     } 
 	
     /**

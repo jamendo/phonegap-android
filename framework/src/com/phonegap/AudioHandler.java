@@ -18,6 +18,7 @@ import com.phonegap.api.PluginResult;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.util.Log;
 
 /**
  * This class called by DroidGap to play and record audio.  
@@ -117,18 +118,36 @@ public class AudioHandler extends Plugin {
 		}
         this.players.clear();
 	}
+	
 
     //--------------------------------------------------------------------------
     // LOCAL METHODS
     //--------------------------------------------------------------------------
 
 	/**
+	 * Destroy the player with the given id
+	 * 
+	 * @param id				The id of the audio player
+	 * 
+	 */
+	
+	public void destroyPlayer(String id){
+    	AudioPlayer audio = this.players.get(id);
+    	if (audio != null) {
+    		audio.destroy();
+    		this.players.remove(id);
+    	}
+	}	
+	
+	
+	/**
 	 * Start recording and save the specified file.
 	 * 
 	 * @param id				The id of the audio player
 	 * @param file				The name of the file
 	 */
-    public void startRecordingAudio(String id, String file) {
+
+	public void startRecordingAudio(String id, String file) {
     	// If already recording, then just return;
     	if (this.players.containsKey(id)) {
     		return;
@@ -189,8 +208,8 @@ public class AudioHandler extends Plugin {
     	AudioPlayer audio = this.players.get(id);
     	if (audio != null) {
     		audio.stopPlaying();
-    		//audio.destroy();
-    		//this.players.remove(id);
+    		audio.destroy();
+    		this.players.remove(id);
     	}
     }
     
@@ -282,5 +301,11 @@ public class AudioHandler extends Plugin {
 			return -1;
 		}
     }       
+    
+	@Override
+	public PluginResult execute(String action, JSONArray args,
+			String callbackId, DroidGap ctx) {
+		return execute(action, args, callbackId);
+	}
 	
 }
